@@ -1,6 +1,6 @@
 close all;
 clc;
-
+% figure;
 % signal generation;如果想要进行100组独立的测试，可以建立100次循环，产生100组独立的数据
 for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM...
     System.BitPerSymbol = j;
@@ -18,8 +18,9 @@ for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 
         %数据的不同调制方式产生：这里把2^3（8QAM）的形式单独拿出来设置，是为了实现最优的星型8QAM星座图
         if M ~= 8
-            h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
-            Tx.DataConstel = modulate(h,Tx.DataSymbol);
+%             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
+%             Tx.DataConstel = modulate(h,Tx.DataSymbol);
+                Tx.DataConstel = qammod(Tx.DataSymbol, M, 'gray');
         else
             tmp = Tx.DataSymbol;
             tmp2  = zeros(1,length(Tx.DataSymbol));
@@ -89,9 +90,10 @@ for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         plot(center, '.');
         
     end    
-    plot(fs1,'*-');
+    plot(fs1,'.-');
     grid on
     hold on
+    the(j) = mean(fs1);
 end
 legend('PSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
 % legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
