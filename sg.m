@@ -1,15 +1,13 @@
-close all;
-clc;
-% figure;
+% close all;
+% clc;
+figure;
 % signal generation;如果想要进行100组独立的测试，可以建立100次循环，产生100组独立的数据
+the = zeros(1,9);
 for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM;7.FSK;8:4ASK;9.8ASK
-    if j < 7
+    if j < 8
         System.BitPerSymbol = j;
     else
-        if j == 7
-        else
-            System.BitPerSymbol = mod(j,6);
-        end
+        System.BitPerSymbol = mod(j,6);
     end
     snr = 0:100;  %SNR信噪比的设置，单位dB
 %     figure;
@@ -24,70 +22,41 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         Tx.DataSymbol = randi([0 M-1],1,10000);%每一次随机产生的数据量，这里暂时设为数据点个数为10000个
 
         %数据的不同调制方式产生：这里把2^3（8QAM）的形式单独拿出来设置，是为了实现最优的星型8QAM星座图
-        if M ~= 8
+        if j == 7 %fsk
+            Tx.DataConstel = fskmod(Tx.DataSymbol,M,50,j,15000);
+        elseif j > 7            
+            Tx.DataConstel = Tx.DataSymbol;            
+        elseif M ~= 8
 %             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
 %             Tx.DataConstel = modulate(h,Tx.DataSymbol);
                 Tx.DataConstel = qammod(Tx.DataSymbol, M, 'gray');
         else
-            tmp = Tx.DataSymbol;
-            tmp2  = zeros(1,length(Tx.DataSymbol));
-            for kk = 1:length(Tx.DataSymbol)
-
-                switch tmp(kk)
-                    case 0
-                        if j > 7
-                            tmp2(kk) = 0;
-                        else                            
+                tmp = Tx.DataSymbol;
+                tmp2  = zeros(1,length(Tx.DataSymbol));
+                for kk = 1:length(Tx.DataSymbol)
+                    switch tmp(kk)
+                        case 0
                             tmp2(kk) = 1 + 1i;
-                        end
-                    case 1
-                        if j>7
-                            tmp2(kk) = 1;
-                        else
+                        case 1
                             tmp2(kk) = -1 + 1i;
-                        end
-                    case 2
-                        if j>7
-                            tmp2(kk) = 2;
-                        else
+                        case 2
                             tmp2(kk) = -1 - 1i;
-                        end
-                    case 3
-                        if j>7
-                            tmp2(kk) = 3;
-                        else
+                        case 3
                             tmp2(kk) = 1 - 1i;
-                        end
-                    case 4
-                        if j>7
-                            tmp2(kk) = 4;
-                        else
+                        case 4
                             tmp2(kk) = 1+sqrt(3);
-                        end
-                    case 5
-                        if j>7
-                            tmp2(kk) = 5;
-                        else
+                        case 5
                             tmp2(kk) = 0 + 1i .* (1+sqrt(3));
-                        end
-                    case 6
-                        if j>7
-                            tmp2(kk) = 6;
-                        else
+                        case 6
                             tmp2(kk) = 0 - 1i .* (1+sqrt(3));
-                        end
-                    case 7
-                        if j>7
-                            tmp2(kk) = 7;
-                        else
+                        case 7
                             tmp2(kk) = -1-sqrt(3);
-                        end
+                    end
                 end
-            end
-            Tx.DataConstel = tmp2;
-            clear tmp tmp2;
+                Tx.DataConstel = tmp2;
+                clear tmp tmp2;
         end
-
+        
         Tx.Signal = Tx.DataConstel;
 
         %数据的载波加载，考虑到相位噪声等
@@ -134,7 +103,8 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
     hold on
     the(j) = mean(fs1);
 end
-legend('PSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
+% legend('QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
+legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
 % legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
 
 
