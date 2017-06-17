@@ -1,6 +1,9 @@
 % close all;
 % clc;
 figure;
+
+lineStyle = ['o-';  'h-';  '*-';  '.-';  'x-';  's-';  'd-';  '^-';  'p-'];
+
 % signal generation;如果想要进行100组独立的测试，可以建立100次循环，产生100组独立的数据
 the = zeros(1,9);
 for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM;7.FSK;8:4ASK;9.8ASK
@@ -9,7 +12,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
     else
         System.BitPerSymbol = mod(j,6);
     end
-    snr = 0:100;  %SNR信噪比的设置，单位dB
+    snr = 0:20;  %SNR信噪比的设置，单位dB
 %     figure;
     fs1 = zeros(1,16);
     for snrIndex= 1:length(snr)
@@ -25,7 +28,13 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         if j == 7 %fsk
             Tx.DataConstel = fskmod(Tx.DataSymbol,M,50,j,15000);
         elseif j > 7            
-            Tx.DataConstel = Tx.DataSymbol;            
+%             Tx.DataConstel = Tx.DataSymbol > M/2;
+            for kk = 1:length(Tx.DataSymbol)
+                Tx.DataConstel(kk) = Tx.DataSymbol(kk) - M/2;
+                if(Tx.DataSymbol(kk) >= M/2)
+                    Tx.DataConstel(kk) = Tx.DataConstel(kk) + 1;
+                end
+            end
         elseif M ~= 8
 %             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
 %             Tx.DataConstel = modulate(h,Tx.DataSymbol);
@@ -82,9 +91,8 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         subplot(1,4,snrIndex); 
 %         plot(Rx.Signal,'.');
                 
-        fs1(snrIndex) = classify(Rx.Signal);
-        
-        
+        fs1(snrIndex) = classify(CMAOUT);
+                
 %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
 %         center = subclust(si, [0.1 0.1]);
 %         hold on;
@@ -98,7 +106,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         plot(center, '.');
         
     end    
-    plot(fs1,'.-');
+    plot(fs1,lineStyle(j,:));
     grid on
     hold on
     the(j) = mean(fs1);
@@ -106,9 +114,3 @@ end
 % legend('QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
 legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
 % legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
-
-
-
-
-
-

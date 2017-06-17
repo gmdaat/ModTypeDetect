@@ -10,4 +10,18 @@ function [fs1] = classify(x)
     c21 = m21;
     
     fs1 = abs(c80)/(abs(c21)^4);
+    
+    xdm = medfilt1(abs(diff(x)));
+    
+    md42 = MMk(xdm, 4, 2);
+    md20 = MMk(xdm ,2, 0);
+    md21 = MMk(xdm, 2, 1);
+    md63 = MMk(xdm, 6, 3);
+    md41 = MMk(xdm, 4, 1);
+    
+    cd42 = md42 - abs(md20)^2 - 2*md21^2;
+    cd63 = md63 - 6*md41*md20 - 9*md42*md21 + 18*md20^2*md21 + 12*md21^3;
+    
+    fs2 = (abs(cd63)^2)/(abs(cd42)^3);
+    
 end
