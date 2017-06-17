@@ -76,12 +76,12 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         carrier1 = exp(1i*(2*pi*t*Tx.Carrier + Phase1));
         Tx.Signal = Tx.Signal.*carrier1;
 
-        if(M==2)
+        if(j == 1 || j >=8 )
             Tx.Signal = complex(Tx.Signal);
         end
         
-%         Rx.Signal = awgn(Tx.Signal,snr(snrIndex),'measured');%数据在AWGN信道下的接收
-        Rx.Signal = Tx.Signal;
+        Rx.Signal = awgn(Tx.Signal,snr(snrIndex),'measured');%数据在AWGN信道下的接收
+%         Rx.Signal = Tx.Signal;
 
         CMAOUT = Rx.Signal;
 
@@ -91,7 +91,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         subplot(1,4,snrIndex); 
 %         plot(Rx.Signal,'.');
                 
-        fs1(snrIndex) = classify(CMAOUT);
+        fs1(snrIndex) = classify(Rx.Signal);
                 
 %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
 %         center = subclust(si, [0.1 0.1]);
@@ -107,11 +107,9 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         
     end    
     plot(fs1,lineStyle(j,:));
-%     axis([0 50 0 35]);
     grid on
     hold on
     the(j) = mean(fs1);
 end
 % legend('QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
-legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
-% legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
+% legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
