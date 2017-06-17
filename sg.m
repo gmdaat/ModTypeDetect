@@ -2,8 +2,15 @@ close all;
 clc;
 % figure;
 % signal generation;如果想要进行100组独立的测试，可以建立100次循环，产生100组独立的数据
-for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM...
-    System.BitPerSymbol = j;
+for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM;7.FSK;8:4ASK;9.8ASK
+    if j < 7
+        System.BitPerSymbol = j;
+    else
+        if j == 7
+        else
+            System.BitPerSymbol = mod(j,6);
+        end
+    end
     snr = 0:100;  %SNR信噪比的设置，单位dB
 %     figure;
     fs1 = zeros(1,16);
@@ -28,21 +35,53 @@ for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 
                 switch tmp(kk)
                     case 0
-                        tmp2(kk) = 1 + 1i;
+                        if j > 7
+                            tmp2(kk) = 0;
+                        else                            
+                            tmp2(kk) = 1 + 1i;
+                        end
                     case 1
-                        tmp2(kk) = -1 + 1i;
+                        if j>7
+                            tmp2(kk) = 1;
+                        else
+                            tmp2(kk) = -1 + 1i;
+                        end
                     case 2
-                        tmp2(kk) = -1 - 1i;
+                        if j>7
+                            tmp2(kk) = 2;
+                        else
+                            tmp2(kk) = -1 - 1i;
+                        end
                     case 3
-                        tmp2(kk) = 1 - 1i;
+                        if j>7
+                            tmp2(kk) = 3;
+                        else
+                            tmp2(kk) = 1 - 1i;
+                        end
                     case 4
-                        tmp2(kk) = 1+sqrt(3);
+                        if j>7
+                            tmp2(kk) = 4;
+                        else
+                            tmp2(kk) = 1+sqrt(3);
+                        end
                     case 5
-                        tmp2(kk) = 0 + 1i .* (1+sqrt(3));
+                        if j>7
+                            tmp2(kk) = 5;
+                        else
+                            tmp2(kk) = 0 + 1i .* (1+sqrt(3));
+                        end
                     case 6
-                        tmp2(kk) = 0 - 1i .* (1+sqrt(3));
+                        if j>7
+                            tmp2(kk) = 6;
+                        else
+                            tmp2(kk) = 0 - 1i .* (1+sqrt(3));
+                        end
                     case 7
-                        tmp2(kk) = -1-sqrt(3);
+                        if j>7
+                            tmp2(kk) = 7;
+                        else
+                            tmp2(kk) = -1-sqrt(3);
+                        end
                 end
             end
             Tx.DataConstel = tmp2;
@@ -95,7 +134,7 @@ for j = 1:6  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
     hold on
     the(j) = mean(fs1);
 end
-legend('PSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
+legend('PSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
 % legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
 
 
