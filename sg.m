@@ -1,10 +1,18 @@
-close all;
-clc;
+% close all;
+% clc;
+figure;
+
+lineStyle = ['o-';  'h-';  '*-';  '.-';  'x-';  's-';  'd-';  '^-';  'p-'; '*-'; '*-'];
 
 % signal generation;如果想要进行100组独立的测试，可以建立100次循环，产生100组独立的数据
-for j = 2:7  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM  7.FSK....
-    System.BitPerSymbol = j;
-    snr = 0:100;  %SNR信噪比的设置，单位dB
+the = zeros(1,11);
+for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM; 7.2FSK; 8.4FSK; 9.8FSK; 10.4ASK; 11.8ASK
+    if j < 10
+        System.BitPerSymbol = j;
+    else
+        System.BitPerSymbol = mod(j,6);
+    end
+    snr = 0:20;  %SNR信噪比的设置，单位dB
 %     figure;
     fs1 = zeros(1,16);
     for snrIndex= 1:length(snr)
@@ -17,18 +25,25 @@ for j = 2:7  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         Tx.DataSymbol = randi([0 M-1],1,10000);%每一次随机产生的数据量，这里暂时设为数据点个数为10000个
 
         %数据的不同调制方式产生：这里把2^3（8QAM）的形式单独拿出来设置，是为了实现最优的星型8QAM星座图
-        if M ~= 8 && M ~= 128
-            h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
-            Tx.DataConstel = modulate(h,Tx.DataSymbol);
+        if j == 7 || j == 8 || j == 9 %fsk
+            Tx.DataSymbol = randi([0 M/64-1],1,10000);
+            Tx.DataConstel = fskmod(Tx.DataSymbol,M/64,50,j,15000);
+        elseif j > 9       
+            Tx.DataConstel = Tx.DataSymbol;
+%             for kk = 1:length(Tx.DataSymbol)
+%                 Tx.DataConstel(kk) = Tx.DataSymbol(kk) - M/2;
+%                 if(Tx.DataSymbol(kk) >= M/2)
+%                     Tx.DataConstel(kk) = Tx.DataConstel(kk) + 1;
+%                 end
+%             end
+        elseif M ~= 8
+             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
+             Tx.DataConstel = modulate(h,Tx.DataSymbol);
+               % Tx.DataConstel = qammod(Tx.DataSymbol, M, 'gray');
         else
-            if M == 128
-                Tx.DataConstel = fskmod(Tx.DataSymbol,M,50,j,15000);
-                %Tx.DataConstel = modulate(h,Tx.DataSymbol);
-            else
                 tmp = Tx.DataSymbol;
                 tmp2  = zeros(1,length(Tx.DataSymbol));
                 for kk = 1:length(Tx.DataSymbol)
-
                     switch tmp(kk)
                         case 0
                             tmp2(kk) = 1 + 1i;
@@ -48,10 +63,8 @@ for j = 2:7  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
                             tmp2(kk) = -1-sqrt(3);
                     end
                 end
-            
                 Tx.DataConstel = tmp2;
                 clear tmp tmp2;
-            end
         end
         
         Tx.Signal = Tx.DataConstel;
@@ -79,9 +92,8 @@ for j = 2:7  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         subplot(1,4,snrIndex); 
 %         plot(Rx.Signal,'.');
                 
-        fs1(snrIndex) = classify(Rx.Signal);
-        
-        
+        fs1(snrIndex) = classify(CMAOUT);
+                
 %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
 %         center = subclust(si, [0.1 0.1]);
 %         hold on;
@@ -95,15 +107,12 @@ for j = 2:7  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %         plot(center, '.');
         
     end    
-    plot(fs1,'.-');
+    plot(fs1,lineStyle(j,:));
+%     axis([0 50 0 35]);
     grid on
     hold on
+    the(j) = mean(fs1);
 end
-legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM', 'FSK');
+% legend('QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
+legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM', '2FSK', '4FSK', '8FSK', '4ASK', '8ASK');
 % legend( 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM');
-
-
-
-
-
-
