@@ -28,13 +28,13 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         if j == 7 %fsk
             Tx.DataConstel = fskmod(Tx.DataSymbol,M,50,j,15000);
         elseif j > 7            
-%             Tx.DataConstel = Tx.DataSymbol > M/2;
-            for kk = 1:length(Tx.DataSymbol)
-                Tx.DataConstel(kk) = Tx.DataSymbol(kk) - M/2;
-                if(Tx.DataSymbol(kk) >= M/2)
-                    Tx.DataConstel(kk) = Tx.DataConstel(kk) + 1;
-                end
-            end
+            Tx.DataConstel = Tx.DataSymbol;
+%             for kk = 1:length(Tx.DataSymbol)
+%                 Tx.DataConstel(kk) = Tx.DataSymbol(kk) - M/2;
+%                 if(Tx.DataSymbol(kk) >= M/2)
+%                     Tx.DataConstel(kk) = Tx.DataConstel(kk) + 1;
+%                 end
+%             end
         elseif M ~= 8
 %             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
 %             Tx.DataConstel = modulate(h,Tx.DataSymbol);
@@ -107,6 +107,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         
     end    
     plot(fs1,lineStyle(j,:));
+%     axis([0 50 0 35]);
     grid on
     hold on
     the(j) = mean(fs1);
