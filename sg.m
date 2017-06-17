@@ -2,32 +2,33 @@
 % clc;
 figure;
 
-lineStyle = ['o-';  'h-';  '*-';  '.-';  'x-';  's-';  'd-';  '^-';  'p-'];
 
-% signal generation;Èç¹ûÏëÒª½øĞĞ100×é¶ÀÁ¢µÄ²âÊÔ£¬¿ÉÒÔ½¨Á¢100´ÎÑ­»·£¬²úÉú100×é¶ÀÁ¢µÄÊı¾İ
-the = zeros(1,9);
-for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM;7.FSK;8:4ASK;9.8ASK
-    if j < 8
-        System.BitPerSymbol = j;
-    else
-        System.BitPerSymbol = mod(j,6);
-    end
-    snr = 0:20;  %SNRĞÅÔë±ÈµÄÉèÖÃ£¬µ¥Î»dB
+lineStyle = ['o-';  'h-';  '*-';  '.-';  'x-';  's-';  'd-';  '^-';  'p-'; '*-'; '*-'];
+
+% signal generation;å¦‚æœæƒ³è¦è¿›è¡Œ100ç»„ç‹¬ç«‹çš„æµ‹è¯•ï¼Œå¯ä»¥å»ºç«‹100æ¬¡å¾ªç¯ï¼Œäº§ç”Ÿ100ç»„ç‹¬ç«‹çš„æ•°æ®
+the = zeros(1,11);
+for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM; 7.2FSK; 8.4FSK; 9.8FSK; 10.4ASK; 11.8ASK
+
+    System.BitPerSymbol = j;
+    snr = 0:20;  %SNRä¿¡å™ªæ¯”çš„è®¾ç½®ï¼Œå•ä½dB
 %     figure;
     fs1 = zeros(1,16);
     for snrIndex= 1:length(snr)
 
-        Tx.SampleRate = 32e9; %symbol Rate£¬ĞÅºÅµÄÂëÔªËÙÂÊ£¬¿ÉÒÔ×ÔĞĞ¶¨Òå
-        Tx.Linewidth = 0;%·¢ÉäĞÅºÅµÄÔØ²¨µÄÏß¿í£¬Ò»°ãÓëĞÅºÅµÄÏàÎ»ÔëÉùÓĞ¹Ø£¬´óĞ¡¿É×ÔĞĞÉèÖÃ£¬ÕâÀïÔİÊ±ÉèÖÃÎª0
-        Tx.Carrier = 0;%·¢ÉäĞÅºÅµÄÔØ²¨ÆµÂÊ£¬¿É×ÔĞĞÉèÖÃ£¬ÕâÀïÔİÉèÎª0
+        Tx.SampleRate = 32e9; %symbol Rateï¼Œä¿¡å·çš„ç å…ƒé€Ÿç‡ï¼Œå¯ä»¥è‡ªè¡Œå®šä¹‰
+        Tx.Linewidth = 0;%å‘å°„ä¿¡å·çš„è½½æ³¢çš„çº¿å®½ï¼Œä¸€èˆ¬ä¸ä¿¡å·çš„ç›¸ä½å™ªå£°æœ‰å…³ï¼Œå¤§å°å¯è‡ªè¡Œè®¾ç½®ï¼Œè¿™é‡Œæš‚æ—¶è®¾ç½®ä¸º0
+        Tx.Carrier = 0;%å‘å°„ä¿¡å·çš„è½½æ³¢é¢‘ç‡ï¼Œå¯è‡ªè¡Œè®¾ç½®ï¼Œè¿™é‡Œæš‚è®¾ä¸º0
         M = 2^System.BitPerSymbol;
 
-        Tx.DataSymbol = randi([0 M-1],1,10000);%Ã¿Ò»´ÎËæ»ú²úÉúµÄÊı¾İÁ¿£¬ÕâÀïÔİÊ±ÉèÎªÊı¾İµã¸öÊıÎª10000¸ö
-
-        %Êı¾İµÄ²»Í¬µ÷ÖÆ·½Ê½²úÉú£ºÕâÀï°Ñ2^3£¨8QAM£©µÄĞÎÊ½µ¥¶ÀÄÃ³öÀ´ÉèÖÃ£¬ÊÇÎªÁËÊµÏÖ×îÓÅµÄĞÇĞÍ8QAMĞÇ×ùÍ¼
-        if j == 7 %fsk
-            Tx.DataConstel = fskmod(Tx.DataSymbol,M,50,j,15000);
-        elseif j > 7            
+        if j == 7 || j == 8 || j == 9 %fsk
+            Tx.DataSymbol = randi([0 M/64-1],1,10000);
+        else
+            Tx.DataSymbol = randi([0 M-1],1,10000);%æ¯ä¸€æ¬¡éšæœºäº§ç”Ÿçš„æ•°æ®é‡ï¼Œè¿™é‡Œæš‚æ—¶è®¾ä¸ºæ•°æ®ç‚¹ä¸ªæ•°ä¸º10000ä¸ª
+        end
+        %æ•°æ®çš„ä¸åŒè°ƒåˆ¶æ–¹å¼äº§ç”Ÿï¼šè¿™é‡ŒæŠŠ2^3ï¼ˆ8QAMï¼‰çš„å½¢å¼å•ç‹¬æ‹¿å‡ºæ¥è®¾ç½®ï¼Œæ˜¯ä¸ºäº†å®ç°æœ€ä¼˜çš„æ˜Ÿå‹8QAMæ˜Ÿåº§å›¾
+        if j == 7 || j == 8 || j == 9 %fsk            
+            Tx.DataConstel = fskmod(Tx.DataSymbol,M/64,50,j,15000);
+        elseif j > 9
             Tx.DataConstel = Tx.DataSymbol;
 %             for kk = 1:length(Tx.DataSymbol)
 %                 Tx.DataConstel(kk) = Tx.DataSymbol(kk) - M/2;
@@ -36,6 +37,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
 %                 end
 %             end
         elseif M ~= 8
+
 %             h = modem.qammod('M', M, 'SymbolOrder', 'Gray');
 %             Tx.DataConstel = modulate(h,Tx.DataSymbol);
                 Tx.DataConstel = qammod(Tx.DataSymbol, M, 'gray');
@@ -68,7 +70,7 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
         
         Tx.Signal = Tx.DataConstel;
 
-        %Êı¾İµÄÔØ²¨¼ÓÔØ£¬¿¼ÂÇµ½ÏàÎ»ÔëÉùµÈ
+        %æ•°æ®çš„è½½æ³¢åŠ è½½ï¼Œè€ƒè™‘åˆ°ç›¸ä½å™ªå£°ç­‰
         N = length(Tx.Signal);
         dt = 1/Tx.SampleRate;
         t = dt*(0:N-1);
@@ -80,17 +82,17 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
             Tx.Signal = complex(Tx.Signal);
         end
         
-        Rx.Signal = awgn(Tx.Signal,snr(snrIndex),'measured');%Êı¾İÔÚAWGNĞÅµÀÏÂµÄ½ÓÊÕ
+        Rx.Signal = awgn(Tx.Signal,snr(snrIndex),'measured');%æ•°æ®åœ¨AWGNä¿¡é“ä¸‹çš„æ¥æ”¶
 %         Rx.Signal = Tx.Signal;
 
         CMAOUT = Rx.Signal;
 
-        %normalization½ÓÊÕĞÅºÅ¹¦ÂÊ¹éÒ»»¯
+        %normalizationæ¥æ”¶ä¿¡å·åŠŸç‡å½’ä¸€åŒ–
         CMAOUT=CMAOUT/sqrt(mean(abs(CMAOUT).^2));
 
 %         subplot(1,4,snrIndex); 
 %         plot(Rx.Signal,'.');
-                
+
         fs1(snrIndex) = classify(Rx.Signal);
                 
 %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
@@ -111,5 +113,5 @@ for j = 1:9  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.6
     hold on
     the(j) = mean(fs1);
 end
-% legend('QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
-% legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM','FSK','4ASK','8ASK');
+legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM', '2FSK', '4FSK', '8FSK', '4ASK', '8ASK');
+
