@@ -1,17 +1,18 @@
 function [type] = classify(x)
-type = -1;
-% 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM; 7.2FSK; 
-%8.4FSK; 9.8FSK;  10.4ASK; 11.8ASK
-%type1th
-%272.0000   33.9599   43.5059   13.9654    1.9869   11.5302    0.5976
-%0.0469    0.0106  48.2447   66.1035
 
-th1 = [272.0000   33.9622   43.5034   13.9617 11.5009  48.2853   66.0788 0];
-%1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5.64QAM 6.4ASK; 7.8ASK 8.MFSK&32QAM
+    type = -1;
+    % 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.64QAM; 7.2FSK; 
+    %8.4FSK; 9.8FSK;  10.4ASK; 11.8ASK
+    %type1th
+    %272.0000   33.9599   43.5059   13.9654    1.9869   11.5302    0.5976
+    %0.0469    0.0106  48.2447   66.1035
 
-th2 = [15.3843    0.5929    5.6314]; %1.2FSK 2.4FSK 3.8FSK&32QAM
+    th1 = [272.0000   33.9622   43.5034   13.9617 11.5009  48.2853   66.0788 0];
+    %1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5.64QAM 6.4ASK; 7.8ASK 8.MFSK&32QAM
 
-th3 = [3.2305 0];%1.32QAM 2.8FSK
+    th2 = [15.8673    0.8983    3.7164    6.7745]; %1.2FSK 2.4FSK 3.8FSK 4.32QAM
+
+    th3 = [3.2305 0];%1.32QAM 2.8FSK
 
     m80 = MMk(x, 8, 0);
     m60 = MMk(x, 6, 0);
@@ -61,20 +62,22 @@ th3 = [3.2305 0];%1.32QAM 2.8FSK
         diff2 = abs(th2-fs2);
         fil2 = find(diff2 == min(diff2));
         
-        if fil2 ~=3
+        if fil2 ~=4
             type = fil2 + 6;
         else
-            xt = real(x);
-            yt = imag(x);
-            instantAmplitude = sqrt(xt.^2 + yt.^2);
-            AmplitudeMean = mean( ( instantAmplitude - 1 ) );  
-            diff3 = abs(th3 - AmplitudeMean);
-            fil1 = find(diff3 == min(diff3));
-            if fil1 == 1
-                type = 5;
-            else
-                type = 9;
-            end
+            type = 5;
+%         else
+%             xt = real(x);
+%             yt = imag(x);
+%             instantAmplitude = sqrt(xt.^2 + yt.^2);
+%             AmplitudeMean = mean( ( instantAmplitude - 1 ) );  
+%             diff3 = abs(th3 - AmplitudeMean);
+%             fil1 = find(diff3 == min(diff3));
+%             if fil1 == 1
+%                 type = 5;
+%             else
+%                 type = 9;
+%             end
         end        
     end
 end
