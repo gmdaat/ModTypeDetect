@@ -90,16 +90,16 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
 
             %normalization接收信号功率归一化
     %         CMAOUT=CMAOUT/sqrt(mean(abs(CMAOUT).^2));
-                        
+    
+%             subplot(1,4,snrIndex); 
+%             plot(Rx.Signal,'.');
+
             type = classify(Rx.Signal);
             
             if type == j
                 cnt = cnt +1;
             end
-             
-%             subplot(1,4,snrIndex); 
-%             plot(Rx.Signal,'.');
-
+            
 %             fs1(snrIndex) = classify(Rx.Signal);
 
     %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
@@ -116,10 +116,11 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
         
         end
         acc(snrIndex) = cnt/100;
+
+    end
 %     hold on
 %     plot(fs1,lineStyle(j,:));
 %     the(j) = mean(fs1);
-    end
     hold on
     plot(snr, acc,lineStyle(j,:));
     axis([-5 30 0 1]);
