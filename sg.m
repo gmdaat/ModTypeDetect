@@ -14,7 +14,7 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
     else
         System.BitPerSymbol = j - 8;
     end
-    snr = -5:50;  %SNR信噪比的设置，单位dB
+    snr = -5:30;  %SNR信噪比的设置，单位dB
     fs1 = zeros(1,16);
 
     acc = zeros(1, length(snr));
@@ -34,7 +34,8 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
 
             %数据的不同调制方式产生：这里把2^3（8QAM）的形式单独拿出来设置，是为了实现最优的星型8QAM星座图
             if j == 7 || j == 8 || j == 9 %fsk            
-                Tx.DataConstel = fskmod(Tx.DataSymbol,M/64,50,j,15000);
+%                 Tx.DataConstel = fskmod(Tx.DataSymbol,M/64,50,j,15000);
+                    Tx.DataConstel = fskmod(Tx.DataSymbol, M/64, log2((M/64)), 2, 32);
             elseif j > 9
                 Tx.DataConstel = Tx.DataSymbol;
             elseif M ~= 8
@@ -89,16 +90,16 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
 
             %normalization接收信号功率归一化
     %         CMAOUT=CMAOUT/sqrt(mean(abs(CMAOUT).^2));
+    
+%             subplot(1,4,snrIndex); 
+%             plot(Rx.Signal,'.');
 
             type = classify(Rx.Signal);
             
             if type == j
                 cnt = cnt +1;
             end
-             
-%             subplot(1,4,snrIndex); 
-%             plot(Rx.Signal,'.');
-
+            
 %             fs1(snrIndex) = classify(Rx.Signal);
 
     %         si = [real(Rx.Signal)' imag(Rx.Signal)'];
@@ -115,12 +116,14 @@ for j = 1:11  % bit per symbol: 1. BPSK; 2. QPSK; 3.8QAM; 4. 16QAM; 5. 32QAM; 6.
         
         end
         acc(snrIndex) = cnt/100;
+
+    end
+%     hold on
 %     plot(fs1,lineStyle(j,:));
 %     the(j) = mean(fs1);
-    end
     hold on
     plot(snr, acc,lineStyle(j,:));
-    axis([0 32 0 1]);
+    axis([-5 30 0 1]);
 end
 grid on
 legend('BPSK', 'QPSK', '8QAM', '16QAM', '32QAM', '64QAM', '2FSK', '4FSK', '8FSK', '4ASK', '8ASK');
